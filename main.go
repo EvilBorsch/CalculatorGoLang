@@ -102,8 +102,8 @@ func calcExpr(expr []string) float64 {
 		if isDigit(el) {
 			numbersStack = numbersStack.Push(el)
 		} else {
-			lastEl, err := operationStack.CheckTop()
-			if err == nil {
+			if !operationStack.isEmpty() {
+				lastEl, err := operationStack.CheckTop()
 				if getPriority(el) > getPriority(lastEl) || lastEl == "(" {
 					operationStack = operationStack.Push(el)
 				} else {
@@ -167,5 +167,4 @@ func calc(s string) float64 {
 func main() {
 	testData := "1+2*(3+4/2-(1+2))*2+1"
 	fmt.Println(calc(testData))
-
 }
