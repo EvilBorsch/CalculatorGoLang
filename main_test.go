@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/stretchr/testify/assert"
+	"math"
 	"testing"
 )
 
@@ -39,6 +40,10 @@ func TestCalc(t *testing.T) {
 	twoBrackets = "(30-40)*2+(200-500)/40"
 	result2 := calc(twoBrackets)
 	assert.Equal(result, result2)
+
+	twoBrackets = "1/0"
+	result2 = calc(twoBrackets)
+	assert.Equal(math.Inf(1), result2)
 
 }
 
