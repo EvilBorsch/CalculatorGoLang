@@ -158,26 +158,25 @@ func calcExpr(expr []string) (float64, error) {
 }
 func calcElement(operationStack stack, numbersStack stack) (operaionStack stack, numberStack stack, err error) {
 	numbersStack, firstNumStr, err := numbersStack.Pop()
+	if err != nil {
+		return operationStack, numbersStack, err
+	}
 	firstNum, err := StringToFloat(firstNumStr)
-
 	if err != nil {
 		return operationStack, numbersStack, err
 	}
 
 	numbersStack, secondNumStr, err := numbersStack.Pop()
-
 	if err != nil {
 		return operationStack, numbersStack, err
 	}
 
 	secondNum, err := StringToFloat(secondNumStr)
-
 	if err != nil {
 		return operationStack, numbersStack, err
 	}
 
 	operationStack, operation, err := operationStack.Pop()
-
 	if err != nil {
 		return operationStack, numbersStack, err
 	}
