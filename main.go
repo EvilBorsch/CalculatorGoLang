@@ -42,24 +42,22 @@ func isDigit(v string) bool {
 }
 
 func factorize(s string) []string {
-	i := 0
 	resArr := make([]string, 0)
 	number := ""
-	for i < len(s) {
-		if isDigit(string(s[i])) {
-			for i < len(s) && isDigit(string(s[i])) {
 
-				number += string(s[i])
-				i++
-			}
+	for i := range s {
+		if isDigit(string(s[i])) {
+			number += string(s[i])
+			continue
+		}
+		if number != "" {
 			resArr = append(resArr, number)
 			number = ""
-
 		}
-		if i < len(s) {
-			resArr = append(resArr, string(s[i]))
-		}
-		i++
+		resArr = append(resArr, string(s[i]))
+	}
+	if number != "" {
+		resArr = append(resArr, number)
 	}
 	return resArr
 }

@@ -61,19 +61,19 @@ func TestCalc(t *testing.T) {
 
 }
 
+func TestFactorize(t *testing.T) {
+	assert := assert.New(t)
+	var res = []string{"20", "+", "30", "*", "40"}
+	assert.Equal(factorize("20+30*40"), res)
+	res = []string{"2", "+", "3", "*", "4"}
+	assert.Equal(factorize("2+3*4"), res)
+
+}
+
 func TestIsDigit(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal(isDigit("2"), true)
 	assert.Equal(isDigit("a"), false)
-}
-
-func TestFactorize(t *testing.T) {
-	assert := assert.New(t)
-	var res = []string{"2", "+", "3", "*", "4"}
-	assert.Equal(factorize("2+3*4"), res)
-
-	res = []string{"20", "+", "30", "*", "40"}
-	assert.Equal(factorize("20+30*40"), res)
 }
 
 func TestElementCalc(t *testing.T) {
