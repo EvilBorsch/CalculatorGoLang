@@ -69,7 +69,7 @@ func getPriority(ch string) int {
 	const highPriority = 2
 	const openBrackPriority = 500
 	const closeBrackPriority = -2
-	const errorCode = 404
+	const anotherSymbolPriority = 404
 	switch ch {
 	case "+":
 		return lowPriority
@@ -84,7 +84,7 @@ func getPriority(ch string) int {
 	case ")":
 		return closeBrackPriority
 	default:
-		return errorCode
+		return anotherSymbolPriority
 	}
 }
 
