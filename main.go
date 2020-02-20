@@ -105,6 +105,9 @@ func calcExpr(expr []string) (float64, error) {
 		}
 		if !operationStack.isEmpty() {
 			lastEl, err := operationStack.CheckTop()
+			if err != nil {
+				return 0, err
+			}
 			if getPriority(el) > getPriority(lastEl) || lastEl == "(" {
 				operationStack = operationStack.Push(el)
 				continue
@@ -162,6 +165,11 @@ func calcElement(operationStack stack, numbersStack stack) (operaionStack stack,
 	}
 
 	numbersStack, secondNumStr, err := numbersStack.Pop()
+
+	if err != nil {
+		return operationStack, numbersStack, err
+	}
+
 	secondNum, err := StringToFloat(secondNumStr)
 
 	if err != nil {
