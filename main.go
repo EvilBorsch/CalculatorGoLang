@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -39,7 +41,7 @@ func isDigit(v string) bool {
 	return false
 }
 
-func factorize(s string) []string {
+func factorize(s string) []string { // TODO возвращать ошибку
 	i := 0
 	resArr := make([]string, 0)
 	number := ""
@@ -86,64 +88,85 @@ func getPriority(ch string) int {
 	}
 }
 
-func FloatToString(input_num float64) string {
-	return strconv.FormatFloat(input_num, 'f', 6, 64)
+func FloatToString(inputNum float64) string {
+	return strconv.FormatFloat(inputNum, 'f', -1, 64)
 }
 
-func StringToFloat(st string) float64 {
-	num, _ := strconv.ParseFloat(strings.TrimSpace(st), 64)
-	return num
+func StringToFloat(st string) (float64, error) {
+	num, err := strconv.ParseFloat(strings.TrimSpace(st), 64)
+	return num, err
 }
 
-func calcExpr(expr []string) float64 {
+func calcExpr(expr []string) (float64, error) {
 	operationStack := make(stack, 0)
 	numbersStack := make(stack, 0)
 	for _, el := range expr {
 		if isDigit(el) {
 			numbersStack = numbersStack.Push(el)
-		} else {
-			if !operationStack.isEmpty() {
-				lastEl, err := operationStack.CheckTop()
-				if getPriority(el) > getPriority(lastEl) || lastEl == "(" {
-					operationStack = operationStack.Push(el)
-				} else {
-					if el == ")" {
-						for lastEl != "(" {
-							operationStack, numbersStack = calcElement(operationStack, numbersStack)
-							lastEl, _ = operationStack.CheckTop()
-						}
-						operationStack, _, _ = operationStack.Pop()
-					} else {
-						for getPriority(el) <= getPriority(lastEl) && lastEl != "(" {
-							operationStack, numbersStack = calcElement(operationStack, numbersStack)
-							lastEl, err = operationStack.CheckTop()
-							if err != nil {
-								break
-							}
-						}
-						operationStack = operationStack.Push(el)
+			continue
+		}
+		if !operationStack.isEmpty() {
+			lastEl, err := operationStack.CheckTop()
+			if getPriority(el) > getPriority(lastEl) || lastEl == "(" {
+				operationStack = operationStack.Push(el)
+				continue
+			}
+			if el == ")" {
+				for lastEl != "(" {
+					operationStack, numbersStack, err = calcElement(operationStack, numbersStack)
+					if err != nil {
+						return 0, err
+					}
+					lastEl, err = operationStack.CheckTop()
+					if err != nil {
+						return 0, err
 					}
 				}
-			} else {
-				operationStack = operationStack.Push(el)
+				operationStack, _, err = operationStack.Pop()
+				if err != nil {
+					return 0, err
+				}
+				continue
 			}
+			for getPriority(el) <= getPriority(lastEl) && lastEl != "(" {
+				operationStack, numbersStack, err = calcElement(operationStack, numbersStack)
+				if err != nil {
+					return 0, err
+				}
+				lastEl, _ = operationStack.CheckTop()
+				break
+			}
+			operationStack = operationStack.Push(el)
+			continue
+		}
+		operationStack = operationStack.Push(el)
+	}
+
+	for !operationStack.isEmpty() {
+		err := error(nil)
+		operationStack, numbersStack, err = calcElement(operationStack, numbersStack)
+		if err != nil {
+			return 0, err
 		}
 	}
-	for !operationStack.isEmpty() {
-		operationStack, numbersStack = calcElement(operationStack, numbersStack)
+	_, answerStr, err := numbersStack.Pop()
+	if err != nil {
+		return 0, err
 	}
-	_, answer, _ := numbersStack.Pop()
-	return StringToFloat(answer)
+	return StringToFloat(answerStr)
 }
+func calcElement(operationStack stack, numbersStack stack) (stack, stack, error) {
+	numbersStack, firstNumStr, err := numbersStack.Pop()
+	firstNum, err := StringToFloat(firstNumStr)
 
-func calcElement(operationStack stack, numbersStack stack) (stack, stack) {
-	numbersStack, firstNumStr, _ := numbersStack.Pop()
-	firstNum := StringToFloat(firstNumStr)
+	numbersStack, secondNumStr, err := numbersStack.Pop()
+	secondNum, err := StringToFloat(secondNumStr)
 
-	numbersStack, secondNumStr, _ := numbersStack.Pop()
-	secondNum := StringToFloat(secondNumStr)
+	operationStack, operation, err := operationStack.Pop()
 
-	operationStack, operation, _ := operationStack.Pop()
+	if err != nil {
+		return operationStack, numbersStack, err
+	}
 
 	switch operation {
 	case "+":
@@ -156,15 +179,20 @@ func calcElement(operationStack stack, numbersStack stack) (stack, stack) {
 		numbersStack = numbersStack.Push(FloatToString(float64(secondNum / firstNum)))
 
 	}
-	return operationStack, numbersStack
+	return operationStack, numbersStack, nil
 }
 
-func calc(s string) float64 {
+func calc(s string) (float64, error) {
 	factorizedData := factorize(s)
-	return calcExpr(factorizedData)
+	ans, err := calcExpr(factorizedData)
+	return ans, err
 }
 
 func main() {
-	testData := "1+2*(3+4/2-(1+2))*2+1"
-	fmt.Println(calc(testData))
+	testData := os.Args[len(os.Args)-1]
+	ans, err := calc(testData)
+	if err != nil {
+		log.Fatal("Неккоректные данные")
+	}
+	fmt.Println(ans)
 }
