@@ -41,7 +41,7 @@ func isDigit(v string) bool {
 	return false
 }
 
-func factorize(s string) []string { // TODO возвращать ошибку
+func factorize(s string) []string {
 	i := 0
 	resArr := make([]string, 0)
 	number := ""
@@ -155,7 +155,7 @@ func calcExpr(expr []string) (float64, error) {
 	}
 	return StringToFloat(answerStr)
 }
-func calcElement(operationStack stack, numbersStack stack) (stack, stack, error) {
+func calcElement(operationStack stack, numbersStack stack) (operaionStack stack, numberStack stack, err error) {
 	numbersStack, firstNumStr, err := numbersStack.Pop()
 	firstNum, err := StringToFloat(firstNumStr)
 
